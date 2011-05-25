@@ -44,6 +44,7 @@
                       ;;
                       )
       #+allegro (excl.osi:unsetenv env-name)
+      #+sbcl (sb-posix:unsetenv env-name)
       )))
 
 (test |GET-ENVIRONMENT-VARIABLES vs GET-ENVIRONMENT-VARIABLE|
@@ -53,36 +54,3 @@
                          (cons name
                                (get-environment-variable name)))
                        envs)))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
