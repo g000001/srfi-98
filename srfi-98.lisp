@@ -1,56 +1,25 @@
 ;;;; srfi-98.lisp
 
-(cl:in-package :srfi-98-internal)
-
-(def-suite srfi-98)
-
-(in-suite srfi-98)
+(cl:in-package "https://github.com/g000001/srfi-98#internals")
 
 (defun get-environment-variable (name)
   #+allegro (excl.osi:getenv name)
-  #+sbcl (sb-posix:getenv name))
-
-(test get-environment-variable
-  (is (string= (string-right-trim "/"
-                                  (namestring (user-homedir-pathname)))
-               (string-right-trim "/"
-                                  (get-environment-variable "HOME")))))
+  #+sbcl (sb-posix:getenv name)
+  #+lispworks (hcl:getenv name))
 
 (defun get-environment-variables ()
-  #+allegro (excl.osi:environment)
-  #+sbcl (mapcar (lambda (env)
-                   (let ((pos (position #\= env
-                                        :from-end 'T)))
-                     (cons (subseq env 0 pos)
-                           (subseq env (1+ pos)))))
-                 (sb-ext:posix-environ)))
+  #+allegro
+  (excl.osi:environment)
+  #+sbcl
+  (mapcar (lambda (env)
+            (let ((pos (position #\= env)))
+              (cons (subseq env 0 pos)
+                    (subseq env (1+ pos)))))
+          (sb-ext:posix-environ))
+  #+lispworks
+  (osicat:environment))
 
 (defun (setf get-environment-variable) (val name)
   #+allegro (setf (excl.osi:getenv name) val)
-  #+sbcl (sb-posix:setenv name val 1)) ;t => 1, nil => 0
-
-(test |(setf get-environment-variable)|
-  (let ((env-name (labels ((uniq-env ()
-                             (let ((name (string (gensym))))
-                               (if (get-environment-variable name)
-                                   (uniq-env)
-                                   name))))
-                    (uniq-env))))
-    (unwind-protect (progn
-                      (setf (get-environment-variable env-name) env-name)
-                      ;;
-                      (is (string= (get-environment-variable env-name)
-                                   env-name))
-                      ;;
-                      )
-      #+allegro (excl.osi:unsetenv env-name)
-      #+sbcl (sb-posix:unsetenv env-name)
-      )))
-
-(test |GET-ENVIRONMENT-VARIABLES vs GET-ENVIRONMENT-VARIABLE|
-  (let ((envs (get-environment-variables)))
-    (is (equal envs
-               (mapcar (lambda (e &aux (name (car e)))
-                         (cons name
-                               (get-environment-variable name)))
-                       envs)))))
+  #+sbcl (sb-posix:setenv name val 1)   ;t => 1, nil => 0
+  #+lispworks (hcl:setenv name val))

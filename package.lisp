@@ -2,11 +2,11 @@
 
 (cl:in-package :cl-user)
 
-(defpackage :srfi-98
+(defpackage "https://github.com/g000001/srfi-98"
   (:use)
-  (:export :get-environment-variable
-           :get-environment-variables))
+  (:export get-environment-variable
+           get-environment-variables))
 
-(defpackage :srfi-98-internal
-  (:use :srfi-98 :cl :fiveam))
+(defpackage "https://github.com/g000001/srfi-98#internals"
+  (:use "https://github.com/g000001/srfi-98" cl))
 
