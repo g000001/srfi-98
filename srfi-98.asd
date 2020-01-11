@@ -10,7 +10,7 @@
   :maintainer "CHIBA Masaomi"
   :license "Unlicense"
   :serial t
-  :depends-on (#+lispworks :osicat)
+  :depends-on (#+lispworks :osicat #+sbcl :sb-posix)
   :components ((:file "package")
                (:file "srfi-98")))
 
